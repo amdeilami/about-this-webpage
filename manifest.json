@@ -1,0 +1,26 @@
+{
+    "manifest_version": 3,
+    "name": "About This Webpage",
+    "version": "0.1.0",
+    "description": "Ask about what you are browsing without the burden of copy-paste or switching tabs",
+    "permissions": ["storage", "tabs"],
+    "host_permissions": ["<all_urls>"],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["geminiUtils.js","contentScript.js"]
+      }
+    ],
+    "action": {
+      "default_popup": "popup.html",
+      "default_title": "About This Webpage",
+      "default_icon": {
+        "16": "assets/ext-icon.png",
+        "48": "assets/ext-icon.png",
+        "128": "assets/ext-icon.png"
+      }
+    }
+}
