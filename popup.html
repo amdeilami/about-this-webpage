@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>About this webpage</title>
+    <style>
+        body {
+            width: 300px;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .prompt-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .options {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .send-button, .keys-button {
+            padding: 8px 15px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .send-button:hover, .keys-button:hover {
+            background-color: #357ae8;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .keys-button {
+            background-color: #34a853;
+        }
+        .keys-button:hover {
+            background-color: #2d9249;
+        }
+        .response-area {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 10px;
+        }
+        .error {
+            color: #ea4335;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h3>Ask about this webpage</h3>
+            <button class="keys-button" id="keysButton">KEYS</button>
+        </div>
+        
+        <textarea class="prompt-input" rows="4" placeholder="Type your prompt here..."></textarea>
+        
+        <div class="options">
+            <span>Response type:</span>
+            <div class="option">
+                <input type="radio" id="comprehensive" name="responseType" value="comprehensive" checked>
+                <label for="comprehensive">Comprehensive</label>
+            </div>
+            <div class="option">
+                <input type="radio" id="brief" name="responseType" value="brief">
+                <label for="brief">Brief</label>
+            </div>
+        </div>
+        
+        <button class="send-button">Send</button>
+        
+        <div class="response-area" id="responseArea">
+            <div class="response-placeholder">Responses will appear here...</div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
