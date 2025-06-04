@@ -1,6 +1,4 @@
-/*exported generateContent, createOrGetContentCache */
 /*global conversationHistory, globalCacheName */
-
 /**
  *
  * @param {string} prompt
@@ -8,43 +6,91 @@
  * @param {string} key
  * @returns
  */
-async function generateContent(
+const generateContent = async function (
   prompt,
-  key_type = "gemini-2.5-pro-exp-03-25",
-  key = "AIzaSyDF4CjnxdrJNyyvkb5qtF0ljALmPRI6zek",
+  key_type = "gemini-2.0-flash",
+  key = "AIzaSyDC67HYgl4bi3vDJI67t_Txm2oYL5aDN6E",
+  //key_type = "gemini-2.5-pro-preview-tts",
 ) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${key_type}:generateContent?key=${key}`;
+  //TODO: delte these prints
   console.log(key_type);
   console.log(key);
   const payload = {
-    contents: [
-      {
-        ...conversationHistory,
-        parts: [{ text: prompt }],
-      },
-    ],
+    contents: conversationHistory,
   };
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+  console.log("PRINTING JSON RESPONSEEEE");
+  console.log(response);
+
+  // 2) Only now do we parse the successful response body
+  const data = await response.json();
+  console.log("🟢 generateContent.data from server is:", data);
+
+  console.log(data);
+  const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  console.log("gen text is:");
+  console.log(generatedText);
+
+  // 1) Check status first—do NOT call response.json() until you know it’s ok
+  if (!response.ok) {
+    // Try to pull the raw text (or JSON) from the body
+    let errText;
+    try {
+      // If the server returned JSON, use .json(), otherwise .text()
+      const maybeJson = await response
+        .clone()
+        .json()
+        .catch(() => null);
+      if (maybeJson) {
+        errText = JSON.stringify(maybeJson, null, 2);
+      } else {
+        errText = await response.text();
+      }
+    } catch {
+      errText = `<couldn't read response body>`;
     }
-
-    const data = await response.json();
-    console.log(data);
-    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    return generatedText;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
+    console.error("Server returned error:", errText);
+    throw new Error(`HTTP error! Status: ${response.status}`);
   }
-}
+
+  // try {
+  //   const response = await fetch(url, {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify(payload),
+  //   });
+  //   console.log("🟢 generateContent.data from server is: ");
+  //   const data = await response.json();
+
+  //   if (!response.ok) {
+  //     if (!response.ok) {
+  //       let errText;
+  //       try {
+  //         errText = await response.text();
+  //       } catch {
+  //         errText = `<couldn't read response body>`;
+  //       }
+  //       console.error("Server returned:", errText);
+  //       throw new Error(`HTTP error! Status: ${response.status}`);
+  //     }
+  //   }
+
+  return generatedText;
+  // } catch (error) {
+  //   console.error("Error:", error);
+  //   throw error;
+  // }
+};
+
+// Expose to global scope
+window.generateContent = generateContent;
 
 /**
  * Creates a content cache with the Gemini API using content from functionA.

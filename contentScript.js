@@ -36,7 +36,7 @@ function extractHeadContent() {
 }
 
 function extractBodyText() {
-  // 1. clone the body so we don’t disturb the live page
+  // 1. clone the body so we don't disturb the live page
   const clone = document.body.cloneNode(true);
 
   // 2. remove all blocks that could hide code or injected scripts/styles
@@ -68,8 +68,6 @@ function extractBodyText() {
 
   try {
     const firstResponse = await send(prompt);
-    addToConversationHistory(`user`, prompt);
-    addToConversationHistory("model", firstResponse);
   } catch (error) {
     console.error("Error during initialization:", error);
     // Potentially reset initialization flag or handle error appropriately
@@ -87,8 +85,8 @@ async function send(prompt) {
   let status = false;
 
   try {
+    addToConversationHistory("user", prompt);
     const response = await generateContent(prompt);
-    addToConversationHistory(`user`, prompt);
     addToConversationHistory("model", response);
     status = true;
     return { status, response };
@@ -102,11 +100,25 @@ async function send(prompt) {
 (() => {
   // Listen for messages from the UI
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log("🟢 contentScript.onMessage got:", message);
     const { prompt, responseType, apiKey, keyName } = message;
 
-    async () => {
+    // Handle the async operation
+    (async () => {
       try {
+        if (prompt === undefined) {
+          return;
+        }
         const { status, response } = await send(prompt);
+        // Make sure we're still connected before sending the response
+        console.log("PRINTING TYPE:");
+        console.log(typeof response);
+        console.log("PRINTING CONVERSATION HISTORY:");
+        console.log(conversationHistory);
+        if (chrome.runtime.lastError) {
+          console.error("Connection lost:", chrome.runtime.lastError);
+          return;
+        }
         sendResponse({
           success: status,
           data: response
@@ -114,12 +126,19 @@ async function send(prompt) {
             .replace(/\*\*(.+?)\*\*/g, `<b>$1</b>`),
         });
       } catch (error) {
-        console.log(error);
-        sendResponse({ success: false, data: `` });
+        console.error("Error in message handler:", error);
+        if (!chrome.runtime.lastError) {
+          sendResponse({
+            success: false,
+            error:
+              error.message ||
+              "An error occurred while processing your request",
+          });
+        }
       }
-    };
-  });
+    })();
 
-  // Log when the content script is loaded
-  console.log("content script is loaded and ready to receive messages.");
+    // Return true to indicate we will send a response asynchronously
+    return true;
+  });
 })();
