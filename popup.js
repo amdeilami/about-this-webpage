@@ -15,7 +15,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Add click event listener for the send button
   sendButton.addEventListener("click", () => {
+    console.log("📮 popup: sendButton clicked");
     const promptText = document.querySelector(".prompt-input").value;
+    console.log("📮 popup: promptText =", promptText);
     const responseType = document.querySelector(
       'input[name="responseType"]:checked',
     ).value;

@@ -3,7 +3,7 @@
     "name": "About This Webpage",
     "version": "0.1.0",
     "description": "Ask about what you are browsing without the burden of copy-paste or switching tabs",
-    "permissions": ["storage", "tabs"],
+    "permissions": ["storage", "tabs", "scripting"],
     "host_permissions": ["<all_urls>"],
     "background": {
       "service_worker": "background.js"
@@ -11,7 +11,7 @@
     "content_scripts": [
       {
         "matches": ["<all_urls>"],
-        "js": ["geminiUtils.js","contentScript.js"]
+        "js": ["./geminiUtils.js", "contentScript.js"]
       }
     ],
     "action": {
