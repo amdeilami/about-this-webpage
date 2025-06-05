@@ -9,7 +9,7 @@
 const generateContent = async function (
   prompt,
   key_type = "gemini-2.0-flash",
-  key = "AIzaSyDC67HYgl4bi3vDJI67t_Txm2oYL5aDN6E",
+  key = "",
   //key_type = "gemini-2.5-pro-preview-tts",
 ) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${key_type}:generateContent?key=${key}`;
